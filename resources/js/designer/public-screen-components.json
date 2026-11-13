@@ -1,0 +1,46 @@
+[
+  {
+    "name": "UploadInvestorsConfirmationForm",
+    "key": "@/projects/slfi/uploadInvestorsConfirmationForm/UploadInvestorsConfirmationForm.vue",
+    "components": [
+      { "name": "SlfiCaseHeader", "key": "@/projects/slfi/shared/components/SlfiCaseHeader.vue" }
+    ]
+  },
+  {
+    "name": "SlfiCaseHeader",
+    "key": "@/projects/slfi/shared/components/SlfiCaseHeader.vue"
+  },
+  {
+    "name": "ShowInvestorsConfirmation",
+    "key": "@/projects/slfi/showInvestorsConfirmation/ShowInvestorsConfirmation.vue",
+    "components": [
+      { "name": "SlfiCaseHeader", "key": "@/projects/slfi/shared/components/SlfiCaseHeader.vue" },
+      { "name": "SlfiInvestorsGrid", "key": "@/projects/slfi/shared/components/SlfiInvestorsGrid.vue" }
+    ]
+  },
+  {
+    "name": "SlfiInvestorsGrid",
+    "key": "@/projects/slfi/shared/components/SlfiInvestorsGrid.vue"
+  },
+  {
+    "name": "ReviewInvestorsList",
+    "key": "@/projects/slfi/reviewInvestorsList/ReviewInvestorsList.vue",
+    "components": [
+      { "name": "ReviewInvestorsActions", "key": "@/projects/slfi/reviewInvestorsList/components/ReviewInvestorsActions.vue" },
+      { "name": "SlfiCaseHeader", "key": "@/projects/slfi/shared/components/SlfiCaseHeader.vue" },
+      { "name": "SlfiInvestorsGrid", "key": "@/projects/slfi/shared/components/SlfiInvestorsGrid.vue" }
+    ]
+  },
+  {
+    "name": "ReviewInvestorsActions",
+    "key": "@/projects/slfi/reviewInvestorsList/components/ReviewInvestorsActions.vue"
+  },
+  {
+    "name": "TrackingForm",
+    "key": "@/projects/slfi/trackingForm/TrackingForm.vue",
+    "components": [
+      { "name": "SlfiCaseHeader", "key": "@/projects/slfi/shared/components/SlfiCaseHeader.vue" },
+      { "name": "SlfiInvestorsGrid", "key": "@/projects/slfi/shared/components/SlfiInvestorsGrid.vue" }
+    ]
+  }
+]

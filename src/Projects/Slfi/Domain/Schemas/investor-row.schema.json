@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SlfiInvestorRow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["email", "displayName", "investorName"],
+  "properties": {
+    "uid": { "type": ["integer", "string", "null"] },
+    "email": { "type": "string", "minLength": 1 },
+    "displayName": { "type": "string", "minLength": 1 },
+    "investorName": { "type": "string", "minLength": 1 },
+    "investorId": { "type": "string" },
+    "className": { "type": "string" },
+    "status": { "type": "string" },
+    "sendDate": { "type": "string" },
+    "viewLink": { "type": "string" },
+    "cancelLink": { "type": "string" },
+    "resentLink": { "type": "string" },
+    "editLink": { "type": "string" },
+    "copyLink": { "type": "string" },
+    "copyLinkValue": { "type": "string" }
+  }
+}

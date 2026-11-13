@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  xmlns:pm="http://processmaker.com/BPMN/2.0/Schema.xsd"
+  targetNamespace="http://bpmn.io/schema/bpmn"
+  exporter="ProcessMaker Modeler"
+  exporterVersion="1.0">
+  <bpmn:collaboration id="slfi_collaboration">
+    <bpmn:participant id="slfi_participant" name="SLFI" processRef="slfi_process"/>
+  </bpmn:collaboration>
+  <bpmn:process id="slfi_process" name="SLFI Process" isExecutable="true">
+    <bpmn:documentation>Annual investor confirmation: Tax uploads a list, Reviewer validates emails and triggers bulk investor notifications, then Tax tracks responses until completion.</bpmn:documentation>
+    <bpmn:laneSet id="slfi_lane_set">
+      <bpmn:lane id="slfi_lane_tax" name="Tax">
+        <bpmn:flowNodeRef>slfi_start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_initialize</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_task_submit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_read_upload</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_notify_submit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_task_tracking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_load_tracking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_notify_tracking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_end_tracking</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="slfi_lane_reviewer" name="Reviewer">
+        <bpmn:flowNodeRef>slfi_script_load_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_task_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_save_emails</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_gateway_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_clean_cancel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_script_notify_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>slfi_end_cancel</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="slfi_start" name="Start"
+      pm:allowInterstitial="true"
+      pm:interstitialScreenRef=""
+      pm:elementDestination="{&quot;type&quot;:&quot;taskList&quot;,&quot;value&quot;:null}"
+      pm:assignment="requester"
+      pm:assignedUsers="" pm:assignedGroups=""
+      pm:config="{&quot;web_entry&quot;:null}">
+      <bpmn:outgoing>slfi_flow_start_init</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:scriptTask id="slfi_script_initialize" name="Initialize submit"
+      pm:scriptRef="${script:slfi-initialize-submit}">
+      <bpmn:incoming>slfi_flow_start_init</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_init_submit</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:task id="slfi_task_submit" name="Submit Investor Confirmation Form"
+      pm:screenRef="${screen:slfi-upload-investors-confirmation-form}"
+      pm:allowInterstitial="false"
+      pm:elementDestination="{&quot;type&quot;:&quot;taskSource&quot;,&quot;value&quot;:null}"
+      pm:assignment="requester"
+      pm:assignedUsers="" pm:assignedGroups=""
+      pm:config="{&quot;email_notifications&quot;:{&quot;notifications&quot;:[]},&quot;web_entry&quot;:null}">
+      <bpmn:documentation>PM3 used a second step (Show Investors Confirmation) on the same task; PM4 uses slfi-show-investors-confirmation via script-loaded grid before Review.</bpmn:documentation>
+      <bpmn:incoming>slfi_flow_init_submit</bpmn:incoming>
+      <bpmn:incoming>slfi_flow_return_submit</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_submit_read</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:scriptTask id="slfi_script_read_upload" name="Read upload"
+      pm:scriptRef="${script:slfi-read-upload-investors}">
+      <bpmn:incoming>slfi_flow_submit_read</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_read_notify</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="slfi_script_notify_submit" name="Notify after submit"
+      pm:scriptRef="${script:slfi-send-notifications}">
+      <bpmn:incoming>slfi_flow_read_notify</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_notify_load_review</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="slfi_script_load_review" name="Load review grid"
+      pm:scriptRef="${script:slfi-load-investors-grid}">
+      <bpmn:incoming>slfi_flow_notify_load_review</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_load_review</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:task id="slfi_task_review" name="Review Investors List"
+      pm:screenRef="${screen:slfi-review-investors-list}"
+      pm:allowInterstitial="false"
+      pm:elementDestination="{&quot;type&quot;:&quot;taskSource&quot;,&quot;value&quot;:null}"
+      pm:assignment="user_group"
+      pm:assignedUsers="" pm:assignedGroups="Tax"
+      pm:config="{&quot;selfService&quot;:true,&quot;email_notifications&quot;:{&quot;notifications&quot;:[]},&quot;web_entry&quot;:null}">
+      <bpmn:incoming>slfi_flow_load_review</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_review_save</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:scriptTask id="slfi_script_save_emails" name="Queue investor emails"
+      pm:scriptRef="${script:slfi-save-investor-emails}">
+      <bpmn:incoming>slfi_flow_review_save</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_save_gateway</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="slfi_script_notify_review" name="Notify after review"
+      pm:scriptRef="${script:slfi-send-notifications}">
+      <bpmn:incoming>slfi_flow_cancel_notify</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_notify_cancel_end</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="slfi_gateway_review" name="Review outcome">
+      <bpmn:incoming>slfi_flow_save_gateway</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_gateway_tracking</bpmn:outgoing>
+      <bpmn:outgoing>slfi_flow_gateway_cancel</bpmn:outgoing>
+      <bpmn:outgoing>slfi_flow_return_submit</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="slfi_script_load_tracking" name="Load tracking grid"
+      pm:scriptRef="${script:slfi-load-tracking-grid}">
+      <bpmn:incoming>slfi_flow_gateway_tracking</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_load_tracking_task</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:task id="slfi_task_tracking" name="Tracking Forms"
+      pm:screenRef="${screen:slfi-tracking-form}"
+      pm:allowInterstitial="false"
+      pm:elementDestination="{&quot;type&quot;:&quot;taskSource&quot;,&quot;value&quot;:null}"
+      pm:assignment="process_variable"
+      pm:assignedUsers="SLFI_TAX_USER"
+      pm:assignedGroups=""
+      pm:config="{&quot;email_notifications&quot;:{&quot;notifications&quot;:[]},&quot;web_entry&quot;:null}">
+      <bpmn:incoming>slfi_flow_load_tracking_task</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_tracking_notify</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:scriptTask id="slfi_script_notify_tracking" name="Notify after tracking"
+      pm:scriptRef="${script:slfi-send-notifications}">
+      <bpmn:incoming>slfi_flow_tracking_notify</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_tracking_end</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="slfi_script_clean_cancel" name="Clean investors on cancel"
+      pm:scriptRef="${script:slfi-clean-on-cancel}">
+      <bpmn:incoming>slfi_flow_gateway_cancel</bpmn:incoming>
+      <bpmn:outgoing>slfi_flow_cancel_notify</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="slfi_end_tracking" name="Completed">
+      <bpmn:incoming>slfi_flow_tracking_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="slfi_end_cancel" name="Canceled">
+      <bpmn:incoming>slfi_flow_notify_cancel_end</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="slfi_flow_start_init" sourceRef="slfi_start" targetRef="slfi_script_initialize"/>
+    <bpmn:sequenceFlow id="slfi_flow_init_submit" sourceRef="slfi_script_initialize" targetRef="slfi_task_submit"/>
+    <bpmn:sequenceFlow id="slfi_flow_submit_read" sourceRef="slfi_task_submit" targetRef="slfi_script_read_upload"/>
+    <bpmn:sequenceFlow id="slfi_flow_read_notify" sourceRef="slfi_script_read_upload" targetRef="slfi_script_notify_submit"/>
+    <bpmn:sequenceFlow id="slfi_flow_notify_load_review" sourceRef="slfi_script_notify_submit" targetRef="slfi_script_load_review"/>
+    <bpmn:sequenceFlow id="slfi_flow_load_review" sourceRef="slfi_script_load_review" targetRef="slfi_task_review"/>
+    <bpmn:sequenceFlow id="slfi_flow_review_save" sourceRef="slfi_task_review" targetRef="slfi_script_save_emails"/>
+    <bpmn:sequenceFlow id="slfi_flow_save_gateway" sourceRef="slfi_script_save_emails" targetRef="slfi_gateway_review"/>
+    <bpmn:sequenceFlow id="slfi_flow_gateway_tracking" name="Send bulk email"
+      sourceRef="slfi_gateway_review" targetRef="slfi_script_load_tracking">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">SLFI_FLAG_CANCEL_CASE = ""</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="slfi_flow_gateway_cancel" name="Cancel case"
+      sourceRef="slfi_gateway_review" targetRef="slfi_script_clean_cancel">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">SLFI_FLAG_CANCEL_CASE != "" and SLFI_FLAG_CANCEL_CASE != "RETURN"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="slfi_flow_return_submit" name="Re-upload list"
+      sourceRef="slfi_gateway_review" targetRef="slfi_task_submit">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">SLFI_FLAG_CANCEL_CASE = "RETURN"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="slfi_flow_load_tracking_task" sourceRef="slfi_script_load_tracking" targetRef="slfi_task_tracking"/>
+    <bpmn:sequenceFlow id="slfi_flow_tracking_notify" sourceRef="slfi_task_tracking" targetRef="slfi_script_notify_tracking"/>
+    <bpmn:sequenceFlow id="slfi_flow_tracking_end" sourceRef="slfi_script_notify_tracking" targetRef="slfi_end_tracking"/>
+    <bpmn:sequenceFlow id="slfi_flow_cancel_notify" sourceRef="slfi_script_clean_cancel" targetRef="slfi_script_notify_review"/>
+    <bpmn:sequenceFlow id="slfi_flow_notify_cancel_end" sourceRef="slfi_script_notify_review" targetRef="slfi_end_cancel"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="slfi_diagram">
+    <bpmndi:BPMNPlane id="slfi_plane" bpmnElement="slfi_collaboration">
+      <bpmndi:BPMNShape id="slfi_participant_di" bpmnElement="slfi_participant">
+        <dc:Bounds x="40" y="40" width="900" height="360"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,34 @@
+title: slfi-show-investors-confirmation
+description: Show Investors Confirmation file uploaded (PM3 second step on Submit task)
+type: FORM
+config:
+  - name: Show Investors Confirmation
+    items:
+      - uuid: a1111111-1111-4111-8111-111111111102
+        component: VueComponentRenderTemplate
+        editor-component: VueComponentEditor
+        editor-control: VueComponentEditor
+        label: Vue component Editor
+        inspector: []
+        config:
+          icon: fas fa-pencil-ruler
+          interactive: true
+          componentName: ShowInvestorsConfirmation
+          contentVue: '<ShowInvestorsConfirmation v-model="data" :submit="submit" />'
+          handlerVue: |
+            return {
+              created() {
+                if (!this.data) { return; }
+                if (this.data.SLFI_INVESTORS_GRID === undefined) {
+                  this.$set(this.data, 'SLFI_INVESTORS_GRID', []);
+                }
+              },
+            };
+          components:
+            - name: ShowInvestorsConfirmation
+              key: '@/projects/slfi/showInvestorsConfirmation/ShowInvestorsConfirmation.vue'
+            - name: SlfiCaseHeader
+              key: '@/projects/slfi/shared/components/SlfiCaseHeader.vue'
+            - name: SlfiInvestorsGrid
+              key: '@/projects/slfi/shared/components/SlfiInvestorsGrid.vue'
+          ignoreMustache: true

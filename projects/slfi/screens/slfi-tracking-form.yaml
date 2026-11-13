@@ -1,0 +1,41 @@
+title: slfi-tracking-form
+description: Track the Bulk email sent to the investors
+type: FORM
+config:
+  - name: Tracking Form
+    items:
+      - uuid: a1111111-1111-4111-8111-111111111104
+        component: VueComponentRenderTemplate
+        editor-component: VueComponentEditor
+        editor-control: VueComponentEditor
+        label: Vue component Editor
+        inspector: []
+        config:
+          icon: fas fa-pencil-ruler
+          interactive: true
+          componentName: TrackingForm
+          contentVue: '<TrackingForm v-model="data" :submit="submit" />'
+          handlerVue: |
+            return {
+              created() {
+                if (!this.data) { return; }
+                const keys = {
+                  SLFI_INVESTORS_GRID_TRACKING: [],
+                  SLFI_FLAG_SUBMIT: 'YES',
+                  SLFI_DISABLED_BUTTON_INVESTORS_ZIP: 0,
+                };
+                Object.entries(keys).forEach(([key, fallback]) => {
+                  if (this.data[key] === undefined) {
+                    this.$set(this.data, key, fallback);
+                  }
+                });
+              },
+            };
+          components:
+            - name: TrackingForm
+              key: '@/projects/slfi/trackingForm/TrackingForm.vue'
+            - name: SlfiCaseHeader
+              key: '@/projects/slfi/shared/components/SlfiCaseHeader.vue'
+            - name: SlfiInvestorsGrid
+              key: '@/projects/slfi/shared/components/SlfiInvestorsGrid.vue'
+          ignoreMustache: true

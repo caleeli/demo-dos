@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SLFI coverage: PM3 to PM4</title>
+<style>
+  @page { size: letter; margin: 0.7in 0.7in 0.75in; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #1c1c1c; font: 11pt/1.45 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  header { border-bottom: 3px solid #711426; padding-bottom: 10px; margin-bottom: 16px; }
+  h1 { font-size: 20pt; margin: 0 0 6px; color: #711426; }
+  h2 { font-size: 14pt; margin: 22px 0 6px; color: #711426; }
+  p { margin: 0 0 8px; }
+  .meta { color: #444; font-size: 9.5pt; }
+  .kpis { display: flex; gap: 10px; margin: 14px 0; }
+  .kpi { flex: 1; border: 1px solid #ddd; padding: 8px 10px; }
+  .kpi b { display: block; font-size: 18pt; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9pt; }
+  th, td { border-bottom: 1px solid #ddd; text-align: left; padding: 5px 6px; }
+  th { border-bottom: 2px solid #711426; }
+  td.n, th.n { text-align: right; width: 52px; }
+  .callout { border-left: 3px solid #711426; padding: 6px 10px; margin: 8px 0; background: #f7f4f4; font-size: 10pt; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SLFI coverage: PM3 to PM4</h1>
+  <p class="meta">SLFI Process v1.0. Source: pm-analyze of SLFI_Process-9.pmx vs projects/slfi and src/Projects/Slfi. 13 November 2026.</p>
+</header>
+<div class="kpis">
+  <div class="kpi"><b>60%</b><span>76 of 127 pm-analyze elements converted</span></div>
+  <div class="kpi"><b>~75%</b><span>Core workflow path in git (estimate)</span></div>
+  <div class="kpi"><b>19</b><span>Triggers consolidated into 8 scripts</span></div>
+  <div class="kpi"><b>4</b><span>FORM screens + Vue grids</span></div>
+</div>
+<p>Package git contains BPMN, four YAML/Vue screens, eight script tasks, hexagonal PHP, email template, and architecture docs. Process published as <code>slfi-process</code> (process_id 3).</p>
+<h2>Implemented in repo</h2>
+<table>
+  <thead><tr><th>Family</th><th>Status</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Process BPMN</td><td>Implemented</td><td>Manual start, lanes, FEEL gateway, portable screen/script refs</td></tr>
+    <tr><td>User task screens</td><td>Implemented</td><td>Upload, show (PM3 parity), review, tracking</td></tr>
+    <tr><td>Triggers (19)</td><td>Partial</td><td>8 scripts; plugin mail/cron and Remove Assign Screen deferred</td></tr>
+    <tr><td>PM tables (6)</td><td>Documented</td><td>slfi_* schema in database.md; migrations not generated</td></tr>
+    <tr><td>External form plugin</td><td>Open</td><td>psSLFIFunctions links replaced with API placeholder</td></tr>
+    <tr><td>Tracking JS actions</td><td>Partial</td><td>Reminder / zip buttons stubbed in Vue</td></tr>
+    <tr><td>Message start</td><td>Dropped</td><td>Replaced with interstitial none start</td></tr>
+  </tbody>
+</table>
+<h2>Not implemented (manual review)</h2>
+<div class="callout"><b>Estimated ~25% gap.</b> Cron email dispatch, investor external form, PDF zip mail, PM3 dynaform JavaScript, supervisor permissions, and full Excel parser parity with psSLFIFunctions.</div>
+<table>
+  <thead><tr><th>Asset</th><th class="n">Count</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Plugin classes (investorsData, phpLibrarySLFI)</td><td class="n">2</td><td>No .tar plugin in repo; logic reimplemented partially in PHP use cases</td></tr>
+    <tr><td>Dynaform JavaScript (buttons, grids)</td><td class="n">4</td><td>Replaced by Vue; reminder/zip watchers need script wiring</td></tr>
+    <tr><td>Output / zip documents</td><td class="n">—</td><td>Not in PM3 export inventory for this process</td></tr>
+    <tr><td>Remove Assign Screen</td><td class="n">1</td><td>PM3 redirect hack; not applicable in PM4 task list</td></tr>
+  </tbody>
+</table>
+<footer>
+  <p>pm-analyze ledger: migration/outputs/slfi-ledger.json. Convert package: migration/outputs/slfi-process-package.json.</p>
+</footer>
+</body>
+</html>
